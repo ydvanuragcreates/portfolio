@@ -1,71 +1,89 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Cpu, 
-  Shield, 
-  Zap, 
-  Flame, 
-  Droplets, 
-  Github, 
-  Linkedin, 
-  Mail, 
-  ExternalLink, 
-  Database, 
-  Server,
-  Brain,
-  Layers,
-  Snowflake,
-  Thermometer
+  Terminal, Shield, Cpu, Wifi, Lock, Unlock, 
+  AlertTriangle, CheckCircle, Database, Zap, 
+  Globe, Code, Server, Eye, ExternalLink, Activity, Mail, Github,
+  FileText, Box
 } from 'lucide-react';
 
-/* --- Particle Component for Snow/Embers --- */
-const ParticleBackground = ({ mode }) => {
-  const [particles, setParticles] = useState([]);
+// --- Glitch Text Component ---
+const GlitchText = ({ text, active = true }) => {
+  return (
+    <div className={`relative inline-block font-mono font-bold ${active ? 'animate-pulse' : ''}`}>
+      <span className="relative z-10">{text}</span>
+      {active && (
+        <>
+          <span className="absolute top-0 left-0 -ml-1 text-red-500 opacity-70 animate-ping">{text}</span>
+          <span className="absolute top-0 left-0 ml-1 text-cyan-500 opacity-70 animate-pulse">{text}</span>
+        </>
+      )}
+    </div>
+  );
+};
+
+// --- Custom Cursor Component ---
+const CyberCursor = () => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [clicked, setClicked] = useState(false);
 
   useEffect(() => {
-    // Create random particles
-    const particleCount = 25;
-    const newParticles = Array.from({ length: particleCount }).map((_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      animationDuration: Math.random() * 10 + 10 + 's',
-      animationDelay: Math.random() * 5 + 's',
-      size: Math.random() * 4 + 2 + 'px',
-    }));
-    setParticles(newParticles);
+    const updatePosition = (e) => {
+      setPosition({ x: e.clientX, y: e.clientY });
+    };
+    const updateClick = () => setClicked(true);
+    const endClick = () => setClicked(false);
+
+    window.addEventListener('mousemove', updatePosition);
+    window.addEventListener('mousedown', updateClick);
+    window.addEventListener('mouseup', endClick);
+
+    return () => {
+      window.removeEventListener('mousemove', updatePosition);
+      window.removeEventListener('mousedown', updateClick);
+      window.removeEventListener('mouseup', endClick);
+    };
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className={`absolute rounded-full transition-colors duration-1000 ${
-            mode === 'peace' ? 'bg-cyan-200/60' : 'bg-orange-500/60'
-          }`}
+    <div 
+      className="fixed pointer-events-none z-[100] hidden md:block mix-blend-difference"
+      style={{ left: position.x, top: position.y, transform: 'translate(-50%, -50%)' }}
+    >
+      <div className={`border border-cyan-500 rounded-full transition-all duration-100 ${clicked ? 'w-4 h-4 bg-cyan-500' : 'w-8 h-8'}`}></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full w-[1px] h-4 bg-cyan-500"></div>
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-[1px] h-4 bg-cyan-500"></div>
+      <div className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 w-4 h-[1px] bg-cyan-500"></div>
+      <div className="absolute right-0 top-1/2 translate-x-full -translate-y-1/2 w-4 h-[1px] bg-cyan-500"></div>
+    </div>
+  );
+};
+
+// --- Matrix Rain Effect ---
+const MatrixRain = () => {
+  return (
+    <div className="fixed inset-0 pointer-events-none z-0 opacity-10 font-mono text-green-500 text-xs overflow-hidden leading-none whitespace-pre select-none">
+      {Array.from({ length: 50 }).map((_, i) => (
+        <div 
+          key={i} 
+          className="absolute animate-matrix-fall"
           style={{
-            left: `${p.left}%`,
-            width: p.size,
-            height: mode === 'peace' ? p.size : `${parseInt(p.size) * 1.5}px`, // Embers are slightly elongated
-            borderRadius: mode === 'peace' ? '50%' : '2px', // Snow is round, embers are rough
-            top: mode === 'peace' ? '-10%' : '110%',
-            animation: mode === 'peace' 
-              ? `snowfall ${p.animationDuration} linear infinite` 
-              : `rise ${p.animationDuration} linear infinite`,
-            animationDelay: p.animationDelay,
-            opacity: Math.random() * 0.5 + 0.2
+            left: `${Math.random() * 100}%`,
+            animationDuration: `${Math.random() * 2 + 1}s`,
+            animationDelay: `${Math.random() * 2}s`,
+            opacity: Math.random()
           }}
-        />
+        >
+          {String.fromCharCode(0x30A0 + Math.random() * 96)}
+          <br/>{String.fromCharCode(0x30A0 + Math.random() * 96)}
+          <br/>1
+          <br/>0
+        </div>
       ))}
       <style>{`
-        @keyframes snowfall {
-          0% { transform: translateY(0) translateX(0); opacity: 0; }
-          10% { opacity: 0.8; }
-          100% { transform: translateY(110vh) translateX(20px); opacity: 0; }
-        }
-        @keyframes rise {
-          0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
-          10% { opacity: 0.8; }
-          100% { transform: translateY(-110vh) translateX(-20px) rotate(180deg); opacity: 0; }
+        @keyframes matrix-fall {
+          0% { transform: translateY(-100%); opacity: 0; }
+          10% { opacity: 1; }
+          100% { transform: translateY(100vh); opacity: 0; }
         }
       `}</style>
     </div>
@@ -73,388 +91,432 @@ const ParticleBackground = ({ mode }) => {
 };
 
 const Portfolio = () => {
-  const [mode, setMode] = useState('peace'); // 'peace' or 'fire'
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [scrolled, setScrolled] = useState(false);
+  const [bootState, setBootState] = useState('terminal'); // 'terminal', 'breaching', 'granted'
+  const [logs, setLogs] = useState([]);
+  const [activeTab, setActiveTab] = useState('overview'); // overview, projects, skills
   
-  // Handle scroll for navbar
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // Terminal Logic
+  const [termInput, setTermInput] = useState('');
+  const [termHistory, setTermHistory] = useState([
+    { type: 'system', text: 'Welcome to AY_SHELL v1.0. Type "help" for commands.' }
+  ]);
+  const logsEndRef = useRef(null);
+  const termEndRef = useRef(null);
 
-  // Handle mouse movement for dynamic backgrounds
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePos({
-        x: (e.clientX / window.innerWidth) * 100,
-        y: (e.clientY / window.innerHeight) * 100,
-      });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  const toggleMode = () => {
-    setMode(mode === 'peace' ? 'fire' : 'peace');
-  };
-
-  // Resume Data Mapping
+  // Resume Data
   const projects = [
     {
-      id: 1,
-      title: "Medical AI Chatbot",
-      peaceDesc: "A secure, privacy-focused health assistant. Built with Flask architecture and precise information retrieval protocols using Pinecone vector databases.",
-      fireDesc: "A Generative AI powerhouse powered by Gemini & LangChain. Features RAG architecture for dynamic, context-aware medical intelligence.",
-      tech: ["Python", "Flask", "LangChain", "Gemini", "Pinecone"],
-      icon: <Brain size={24} />,
-      type: "AI/ML"
+      id: "P-01",
+      name: "Medical_AI_Core",
+      realName: "Medical AI Chatbot",
+      desc: "RAG architecture integrating Gemini LLM with Pinecone Vector DB for precise medical diagnostics.",
+      status: "OPERATIONAL",
+      securityLevel: "MAXIMUM",
+      tech: ["Python", "LangChain", "Gemini", "Flask"]
     },
     {
-      id: 2,
-      title: "TrueHomes Real Estate",
-      peaceDesc: "Robust MERN stack architecture with JWT authentication and secure CRUD operations. Optimized for data integrity and reliable user sessions.",
-      fireDesc: "Dynamic property discovery engine. Features interactive browsing, instant filtering, and seamless Google OAuth integration for rapid onboarding.",
-      tech: ["React", "Node.js", "MongoDB", "JWT", "Redux"],
-      icon: <Layers size={24} />,
-      type: "Full Stack"
+      id: "P-02",
+      name: "Sector_TrueHomes",
+      realName: "TrueHomes Real Estate",
+      desc: "MERN Stack property engine featuring JWT Auth, Google OAuth protocols, and Real-time Geo-mapping.",
+      status: "ONLINE",
+      securityLevel: "HIGH",
+      tech: ["React", "MongoDB", "Node.js", "JWT"]
     },
     {
-      id: 3,
-      title: "SWE 180 Internship",
-      peaceDesc: "Optimized MongoDB queries cutting load times by 30%. Architected scalable RESTful APIs supporting 1000+ concurrent users.",
-      fireDesc: "Accelerated deployment cycles by 40% via CI/CD. Implemented high-speed Redis caching to slash API latency by 15%.",
-      tech: ["Node.js", "Redis", "CI/CD", "Optimization"],
-      icon: <Server size={24} />,
-      type: "Experience"
+      id: "P-03",
+      name: "AI_Doc_Gen_V1",
+      realName: "AI Document Generator",
+      desc: "Automated report engine. Uses Gemini & FastAPI to generate Word/PPT. Features Three.js for real-time 3D document previews.",
+      status: "BETA_TEST",
+      securityLevel: "PROTOTYPE",
+      tech: ["FastAPI", "React", "Three.js", "Gemini"]
     }
   ];
 
-  const skills = {
-    peace: [
-      { name: "Node.js & Express", level: "Architect" },
-      { name: "MongoDB & SQL", level: "Secure" },
-      { name: "Java (OOP)", level: "Core" },
-      { name: "System Design", level: "Stable" }
-    ],
-    fire: [
-      { name: "Generative AI", level: "Creative" },
-      { name: "React & Tailwind", level: "Dynamic" },
-      { name: "Python Scripting", level: "Rapid" },
-      { name: "Hackathons", level: "Competitive" }
-    ]
+  // UPDATED CREATIVE SKILLS
+  const skills = [
+    { cat: "SYNTHETIC_MIND", items: ["Generative AI", "Gemini API", "LangChain", "Hugging Face"], color: "text-purple-400" },
+    { cat: "VISUAL_CORTEX", items: ["Three.js", "React", "Tailwind", "Figma"], color: "text-cyan-400" },
+    { cat: "BACKEND_GRID", items: ["FastAPI", "Node.js", "Arcjet Security", "Microservices"], color: "text-green-400" },
+    { cat: "INFRASTRUCTURE", items: ["Docker", "CI/CD", "Pinecone", "Redis"], color: "text-yellow-400" }
+  ];
+
+  // Boot Sequence Logic
+  useEffect(() => {
+    if (bootState === 'terminal') {
+      const sequence = [
+        "Initializing connection...",
+        "Pinging server: 127.0.0.1...",
+        "Response received: 2ms",
+        "Target identified: ANURAG_YADAV_MAINFRAME",
+        "Security Protocol: ACTIVE",
+        "Firewall: DETECTED",
+        "Awaiting User Override..."
+      ];
+      
+      let delay = 0;
+      sequence.forEach((line, index) => {
+        delay += Math.random() * 500 + 200;
+        setTimeout(() => {
+          setLogs(prev => [...prev, `> ${line}`]);
+        }, delay);
+      });
+    }
+  }, [bootState]);
+
+  // Auto-scroll terminal
+  useEffect(() => {
+    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [logs]);
+  
+  // Auto-scroll interactive terminal
+  useEffect(() => {
+    termEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [termHistory]);
+
+  const handleBreach = () => {
+    setBootState('breaching');
+    setLogs([]);
+    const breachSequence = [
+      "INJECTING PAYLOAD...",
+      "BYPASSING AUTHENTICATION...",
+      "DECRYPTING SSL PACKETS...",
+      "ACCESS GRANTED."
+    ];
+    
+    let delay = 0;
+    breachSequence.forEach((line, index) => {
+      delay += 800;
+      setTimeout(() => {
+        setLogs(prev => [...prev, `> ${line}`]);
+        if (index === breachSequence.length - 1) {
+          setTimeout(() => setBootState('granted'), 1000);
+        }
+      }, delay);
+    });
   };
 
-  return (
-    <div className={`min-h-screen transition-colors duration-1000 overflow-x-hidden font-sans selection:bg-opacity-30 ${
-      mode === 'peace' 
-        ? 'bg-slate-950 text-slate-100 selection:bg-cyan-400' 
-        : 'bg-neutral-950 text-orange-50 selection:bg-orange-500'
-    }`}>
-      
-      {/* Particle Background System */}
-      <ParticleBackground mode={mode} />
+  const handleTerminalSubmit = (e) => {
+    e.preventDefault();
+    if (!termInput.trim()) return;
 
-      {/* Dynamic Mouse Gradient Overlay */}
-      <div 
-        className={`fixed inset-0 opacity-20 pointer-events-none transition-all duration-1000 z-0`}
-        style={{
-          background: mode === 'peace'
-            ? `radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, #a5f3fc, transparent 40%)` // More icy white/cyan
-            : `radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, #ef4444, transparent 40%)` // More intense red/orange
-        }}
-      />
+    const cmd = termInput.trim().toLowerCase();
+    const newHistory = [...termHistory, { type: 'user', text: termInput }];
 
-      {/* Frost/Heat Overlay for Texture */}
-      <div className={`fixed inset-0 pointer-events-none transition-opacity duration-1000 z-0 ${
-        mode === 'peace' ? 'opacity-100' : 'opacity-0'
-      }`}
-      style={{
-        backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.03\'/%3E%3C/svg%3E")'
-      }} />
+    switch (cmd) {
+      case 'help':
+        newHistory.push({ type: 'system', text: 'AVAILABLE COMMANDS: help, about, skills, contact, clear' });
+        break;
+      case 'about':
+        newHistory.push({ type: 'system', text: 'TARGET: Anurag Yadav. CS Student. Backend & AI Specialist.' });
+        break;
+      case 'skills':
+        newHistory.push({ type: 'system', text: 'MODULES: Python, React, Node.js, Generative AI, Three.js' });
+        break;
+      case 'contact':
+        newHistory.push({ type: 'system', text: 'EMAIL: anuragyadav.creates@gmail.com' });
+        break;
+      case 'clear':
+        setTermHistory([]);
+        setTermInput('');
+        return;
+      default:
+        newHistory.push({ type: 'error', text: `ERROR: Command "${cmd}" not recognized.` });
+    }
 
-      {/* Navigation */}
-      <nav className={`fixed w-full z-50 transition-all duration-500 ${
-        scrolled ? 'backdrop-blur-md bg-opacity-80 py-4 shadow-lg' : 'py-6 bg-opacity-0'
-      } ${
-        mode === 'peace' 
-          ? 'bg-slate-950/50 border-b border-cyan-100/10 shadow-cyan-900/20' 
-          : 'bg-neutral-950/50 border-b border-orange-500/20 shadow-orange-900/30'
-      }`}>
-        <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
-          <div className="text-2xl font-bold tracking-tighter flex items-center gap-2">
-            <span className={`transition-all duration-500 ${mode === 'peace' ? 'text-cyan-300 drop-shadow-[0_0_8px_rgba(103,232,249,0.5)]' : 'text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.6)]'}`}>
-              {mode === 'peace' ? <Snowflake size={24} /> : <Flame size={24} />}
-            </span>
-            AY.
-          </div>
-          <div className="flex items-center gap-6">
-            <a href="#about" className="hover:opacity-70 transition-opacity hidden md:block">About</a>
-            <a href="#projects" className="hover:opacity-70 transition-opacity hidden md:block">Work</a>
-            <button 
-              onClick={toggleMode}
-              className={`relative px-6 py-2 rounded-full font-medium transition-all duration-500 overflow-hidden group border backdrop-blur-sm ${
-                mode === 'peace' 
-                  ? 'border-cyan-300/30 text-cyan-200 bg-cyan-900/20 hover:bg-cyan-800/30 hover:shadow-[0_0_20px_rgba(103,232,249,0.2)]' 
-                  : 'border-orange-500/50 text-orange-300 bg-orange-900/20 hover:bg-orange-900/40 hover:shadow-[0_0_20px_rgba(249,115,22,0.4)]'
-              }`}
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                {mode === 'peace' ? 'Ignite' : 'Freeze'}
-                {mode === 'peace' ? <Zap size={16} className="animate-pulse"/> : <Snowflake size={16} className="animate-pulse"/>}
-              </span>
-            </button>
-          </div>
-        </div>
-      </nav>
+    setTermHistory(newHistory);
+    setTermInput('');
+  };
 
-      {/* Hero Section */}
-      <header className="relative min-h-screen flex flex-col justify-center items-center text-center px-6 pt-20 z-10">
-        <div className="max-w-4xl relative">
-          <div className={`inline-block mb-4 px-4 py-1.5 rounded-full text-sm border backdrop-blur-md transition-all duration-700 ${
-            mode === 'peace' 
-              ? 'border-cyan-200/20 bg-slate-800/40 text-cyan-200 shadow-[0_0_15px_rgba(103,232,249,0.1)]' 
-              : 'border-orange-500/40 bg-neutral-900/60 text-orange-300 shadow-[0_0_20px_rgba(249,115,22,0.2)]'
-          }`}>
-            {mode === 'peace' ? 'Backend Architect & Security Specialist' : 'GenAI Innovator & Rapid Prototyper'}
+  // --- RENDER: TERMINAL / BOOT SCREEN ---
+  if (bootState !== 'granted') {
+    return (
+      <div className="min-h-screen bg-black text-green-500 font-mono p-6 flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+        
+        <div className="w-full max-w-2xl border-2 border-green-800 bg-black/90 p-4 rounded shadow-[0_0_50px_rgba(0,255,0,0.2)] relative z-10">
+          <div className="flex justify-between items-center border-b border-green-800 pb-2 mb-4">
+            <span className="text-xs">SYS_TERMINAL_V.2.0.25</span>
+            <div className="flex gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-900"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-900"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+            </div>
           </div>
           
-          <h1 className={`text-6xl md:text-8xl font-bold mb-6 tracking-tight transition-all duration-700 ${
-            mode === 'peace' 
-              ? 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-100 via-blue-200 to-cyan-100 drop-shadow-[0_0_15px_rgba(165,243,252,0.3)]' 
-              : 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-orange-500 to-red-600 drop-shadow-[0_0_25px_rgba(234,88,12,0.4)]'
-          }`}>
-            Anurag Yadav
-          </h1>
-          
-          <p className={`text-xl md:text-2xl max-w-2xl mx-auto mb-10 transition-all duration-700 ${
-            mode === 'peace' ? 'text-cyan-100/80 font-light' : 'text-orange-100/90 font-medium'
-          }`}>
-            {mode === 'peace' 
-              ? "Architecting stability. Optimizing systems. I build the calm, frozen logic beneath complex applications."
-              : "Forging innovation. Igniting ideas. I build high-speed AI solutions that burn through the status quo."}
-          </p>
-
-          <div className="flex gap-4 justify-center">
-            <a href="#contact" className={`px-8 py-3 rounded-lg font-bold transition-all duration-300 transform hover:-translate-y-1 ${
-              mode === 'peace' 
-                ? 'bg-cyan-900/40 border border-cyan-400/30 hover:bg-cyan-800/50 text-cyan-100 shadow-[0_0_20px_rgba(8,145,178,0.2)] backdrop-blur-sm' 
-                : 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white shadow-[0_0_30px_rgba(234,88,12,0.4)] border border-orange-500'
-            }`}>
-              Get in Touch
-            </a>
-            <a href="https://github.com" target="_blank" rel="noreferrer" className={`px-8 py-3 rounded-lg font-bold border transition-all duration-300 hover:bg-opacity-10 flex items-center gap-2 backdrop-blur-sm ${
-              mode === 'peace' 
-                ? 'border-cyan-500/40 text-cyan-300 hover:bg-cyan-900/30 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)]' 
-                : 'border-orange-500/60 text-orange-400 hover:bg-orange-900/30 hover:shadow-[0_0_15px_rgba(249,115,22,0.2)]'
-            }`}>
-              View GitHub
-            </a>
-          </div>
-        </div>
-
-        {/* Decor elements */}
-        <div className={`absolute bottom-10 animate-bounce transition-colors duration-1000 ${
-          mode === 'peace' ? 'text-cyan-400/70' : 'text-orange-500/90'
-        }`}>
-          Scroll to Explore
-        </div>
-      </header>
-
-      {/* Skills Split Section */}
-      <section id="about" className="py-20 px-6 relative z-10">
-        <div className="max-w-6xl mx-auto">
-          <div className={`grid md:grid-cols-2 gap-12 p-1 rounded-3xl transition-all duration-1000 ${
-            mode === 'peace' 
-              ? 'bg-slate-900/40 border border-cyan-200/10 backdrop-blur-xl shadow-[0_0_40px_rgba(6,182,212,0.05)]' 
-              : 'bg-neutral-900/60 border border-orange-500/20 backdrop-blur-xl shadow-[0_0_40px_rgba(249,115,22,0.1)]'
-          }`}>
-            
-            {/* Left: Logic/Core (Peace) */}
-            <div className={`p-8 md:p-12 rounded-3xl transition-all duration-700 ${
-              mode === 'peace' 
-                ? 'bg-slate-800/30 opacity-100 border border-cyan-500/10' 
-                : 'opacity-50 blur-[1px] grayscale hover:blur-0 hover:grayscale-0 hover:opacity-100'
-            }`}>
-              <div className="flex items-center gap-3 mb-6">
-                <Database className="text-cyan-300" />
-                <h2 className="text-2xl font-bold text-cyan-100">The Foundation</h2>
-              </div>
-              <p className="text-slate-300 mb-6 leading-relaxed">
-                My background in **Backend Engineering** provides the stability every project needs. 
-                From optimizing MongoDB queries at **SWE 180** to securing RESTful APIs, I ensure 
-                systems are robust and scalable.
-              </p>
-              <ul className="space-y-3">
-                {skills.peace.map((s, i) => (
-                  <li key={i} className="flex justify-between items-center border-b border-slate-700/50 pb-2">
-                    <span className="font-mono text-cyan-200">{s.name}</span>
-                    <span className="text-xs px-2 py-1 rounded bg-slate-700/50 text-cyan-100 border border-cyan-900/30">{s.level}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Right: Chaos/Creation (Fire) */}
-            <div className={`p-8 md:p-12 rounded-3xl transition-all duration-700 ${
-              mode === 'fire' 
-                ? 'bg-neutral-800/40 opacity-100 border border-orange-500/20 shadow-inner shadow-orange-900/20' 
-                : 'opacity-50 blur-[1px] grayscale hover:blur-0 hover:grayscale-0 hover:opacity-100'
-            }`}>
-              <div className="flex items-center gap-3 mb-6">
-                <Cpu className="text-orange-500" />
-                <h2 className="text-2xl font-bold text-orange-100">The Spark</h2>
-              </div>
-              <p className="text-neutral-300 mb-6 leading-relaxed">
-                My passion for **Generative AI** drives innovation. Whether winning top 10 at **Hackbyte '24** or building RAG systems with **Gemini**, I push boundaries to create intelligent, 
-                adaptive software.
-              </p>
-              <ul className="space-y-3">
-                {skills.fire.map((s, i) => (
-                  <li key={i} className="flex justify-between items-center border-b border-neutral-700/50 pb-2">
-                    <span className="font-mono text-orange-300">{s.name}</span>
-                    <span className="text-xs px-2 py-1 rounded bg-orange-900/20 text-orange-200 border border-orange-500/20">{s.level}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Projects Section */}
-      <section id="projects" className="py-20 px-6 relative z-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-end justify-between mb-16">
-            <div>
-              <h2 className={`text-4xl md:text-5xl font-bold mb-4 transition-colors duration-700 ${
-                mode === 'peace' ? 'text-cyan-100 drop-shadow-[0_0_10px_rgba(103,232,249,0.3)]' : 'text-orange-100 drop-shadow-[0_0_15px_rgba(234,88,12,0.4)]'
-              }`}>
-                {mode === 'peace' ? 'Frozen Architecture' : 'Forged Creations'}
-              </h2>
-              <div className={`h-1 w-20 transition-all duration-700 ${
-                mode === 'peace' ? 'bg-cyan-400 shadow-[0_0_10px_#22d3ee]' : 'bg-orange-500 shadow-[0_0_15px_#f97316]'
-              }`}/>
-            </div>
-            <span className={`hidden md:block font-mono text-sm ${
-              mode === 'peace' ? 'text-cyan-400' : 'text-orange-500'
-            }`}>
-              {mode === 'peace' ? 'Listing: Optimized & Secure' : 'Listing: Innovative & Dynamic'}
-            </span>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {projects.map((project) => (
-              <div 
-                key={project.id}
-                className={`group relative p-6 rounded-2xl border transition-all duration-500 hover:-translate-y-2 ${
-                  mode === 'peace' 
-                    ? 'bg-slate-900/40 border-cyan-200/10 backdrop-blur-md hover:border-cyan-400/40 hover:shadow-[0_0_30px_rgba(103,232,249,0.15)]' 
-                    : 'bg-neutral-900/60 border-orange-500/10 backdrop-blur-md hover:border-orange-500/50 hover:shadow-[0_0_30px_rgba(249,115,22,0.25)]'
-                }`}
-              >
-                <div className="flex justify-between items-start mb-6">
-                  <div className={`p-3 rounded-lg transition-all duration-500 ${
-                    mode === 'peace' 
-                      ? 'bg-cyan-900/30 text-cyan-300 shadow-[inset_0_0_10px_rgba(103,232,249,0.2)]' 
-                      : 'bg-orange-900/30 text-orange-500 shadow-[inset_0_0_15px_rgba(249,115,22,0.3)]'
-                  }`}>
-                    {project.icon}
-                  </div>
-                  <ExternalLink size={20} className={`opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                    mode === 'peace' ? 'text-cyan-400' : 'text-orange-400'
-                  }`}/>
-                </div>
-
-                <h3 className={`text-xl font-bold mb-3 transition-colors duration-500 ${
-                  mode === 'peace' ? 'text-slate-100 group-hover:text-cyan-300' : 'text-neutral-100 group-hover:text-orange-300'
-                }`}>
-                  {project.title}
-                </h3>
-
-                <p className={`text-sm mb-6 min-h-[80px] transition-colors duration-500 ${
-                  mode === 'peace' ? 'text-slate-300 font-light' : 'text-neutral-300'
-                }`}>
-                  {mode === 'peace' ? project.peaceDesc : project.fireDesc}
-                </p>
-
-                <div className="flex flex-wrap gap-2 mt-auto">
-                  {project.tech.map((t, i) => (
-                    <span key={i} className={`text-xs px-2 py-1 rounded transition-colors duration-500 ${
-                      mode === 'peace' 
-                        ? 'bg-cyan-900/20 border border-cyan-500/20 text-cyan-200' 
-                        : 'bg-orange-900/20 border border-orange-500/20 text-orange-300'
-                    }`}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
+          <div className="h-64 overflow-y-auto font-mono text-sm space-y-1 mb-4 scrollbar-hide">
+            {logs.map((log, i) => (
+              <div key={i} className={log.includes("ACCESS GRANTED") ? "text-green-300 font-bold text-lg animate-pulse" : "opacity-80"}>
+                {log}
               </div>
             ))}
+            <div ref={logsEndRef} />
           </div>
-        </div>
-      </section>
 
-      {/* Certification Bar */}
-      <section className="py-10 px-6 border-y border-white/5 relative z-10 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto flex flex-wrap justify-center gap-8 md:gap-16 opacity-80 hover:opacity-100 transition-opacity">
-           {["AWS Academy Cloud Foundations", "Oracle OCI GenAI Professional", "Top 10 Hackbyte '24", "Data Analysis (SQL)"].map((cert, i) => (
-             <div key={i} className="flex items-center gap-2">
-               <Shield size={16} className={mode === 'peace' ? 'text-cyan-400' : 'text-orange-500'} />
-               <span className={`font-mono text-sm uppercase tracking-wider ${mode === 'peace' ? 'text-cyan-100' : 'text-orange-100'}`}>{cert}</span>
-             </div>
-           ))}
-        </div>
-      </section>
+          {bootState === 'terminal' && logs.length >= 6 && (
+            <button 
+              onClick={handleBreach}
+              className="w-full py-4 bg-green-900/20 border border-green-500 text-green-400 hover:bg-green-500 hover:text-black font-bold tracking-widest transition-all duration-200 uppercase group"
+            >
+              <span className="group-hover:hidden">[ INITIATE SYSTEM BREACH ]</span>
+              <span className="hidden group-hover:block text-center">ACCESSING CORE...</span>
+            </button>
+          )}
 
-      {/* Contact Section */}
-      <footer id="contact" className="py-20 px-6 relative overflow-hidden z-10">
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h2 className={`text-4xl md:text-6xl font-bold mb-8 transition-all duration-700 ${
-            mode === 'peace' 
-              ? 'text-transparent bg-clip-text bg-gradient-to-b from-cyan-100 to-blue-300' 
-              : 'text-transparent bg-clip-text bg-gradient-to-b from-orange-200 to-red-500'
-          }`}>
-            {mode === 'peace' ? 'Ready to Stabilize?' : 'Ready to Ignite?'}
-          </h2>
-          <p className="text-xl text-slate-400 mb-10 max-w-xl mx-auto">
-            Whether you need robust backend architecture or cutting-edge AI integration, I bring the duality required for modern software.
-          </p>
-          
-          <div className="flex flex-col md:flex-row justify-center gap-4 items-center">
-            <a href="mailto:anuragyadav.creates@gmail.com" className={`flex items-center gap-2 px-8 py-4 rounded-lg font-bold transition-all hover:scale-105 ${
-              mode === 'peace' 
-                ? 'bg-cyan-950 border border-cyan-500/30 text-cyan-100 hover:bg-cyan-900 hover:shadow-[0_0_25px_rgba(6,182,212,0.25)]' 
-                : 'bg-neutral-900 border border-orange-500/30 text-orange-100 hover:bg-neutral-800 hover:shadow-[0_0_25px_rgba(249,115,22,0.3)]'
-            }`}>
-              <Mail size={20} /> anuragyadav.creates@gmail.com
-            </a>
-            <div className="flex gap-4">
-              <a href="#" className={`p-4 rounded-lg transition-colors border ${
-                mode === 'peace' 
-                  ? 'bg-cyan-950/50 border-cyan-500/20 hover:bg-cyan-900/50 text-cyan-400' 
-                  : 'bg-neutral-900/50 border-orange-500/20 hover:bg-orange-900/30 text-orange-500'
-              }`}>
-                <Linkedin size={24} />
-              </a>
-              <a href="https://github.com" target="_blank" rel="noreferrer" className={`p-4 rounded-lg transition-colors border ${
-                mode === 'peace' 
-                  ? 'bg-cyan-950/50 border-cyan-500/20 hover:bg-cyan-900/50 text-cyan-400' 
-                  : 'bg-neutral-900/50 border-orange-500/20 hover:bg-orange-900/30 text-orange-500'
-              }`}>
-                <Github size={24} />
-              </a>
+          {bootState === 'breaching' && (
+            <div className="w-full h-2 bg-green-900 rounded overflow-hidden">
+              <div className="h-full bg-green-500 animate-progress"></div>
             </div>
+          )}
+        </div>
+        <style>{`
+          @keyframes progress { 0% { width: 0% } 100% { width: 100% } }
+          .animate-progress { animation: progress 3s linear forwards; }
+        `}</style>
+      </div>
+    );
+  }
+
+  // --- RENDER: MAIN INTERFACE (HUD) ---
+  return (
+    <div className="min-h-screen bg-slate-950 text-cyan-50 font-mono relative overflow-x-hidden selection:bg-cyan-500 selection:text-black cursor-none">
+      
+      <CyberCursor />
+
+      {/* Background Effects */}
+      <MatrixRain />
+      <div className="fixed inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 pointer-events-none bg-[length:100%_2px,3px_100%]"></div>
+      <div className="fixed inset-0 pointer-events-none z-20 shadow-[inset_0_0_100px_rgba(0,0,0,0.9)]"></div>
+
+      {/* Main Container */}
+      <div className="relative z-30 max-w-7xl mx-auto p-4 md:p-8 min-h-screen flex flex-col">
+        
+        {/* Header HUD */}
+        <header className="border-b border-cyan-900/50 pb-6 mb-8 flex flex-col md:flex-row justify-between items-end gap-4">
+          <div>
+            <div className="text-xs text-cyan-600 mb-1 flex items-center gap-2">
+              <Wifi size={12} className="animate-pulse" /> CONNECTION_SECURE
+            </div>
+            {/* UPDATED NAME STYLING FOR BETTER VISIBILITY */}
+            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)] glitch-effect">
+              ANURAG_YADAV
+            </h1>
+            <p className="text-cyan-400/60 mt-2 text-sm max-w-md border-l-2 border-cyan-800 pl-3">
+              :: SYSTEM ARCHITECT :: BACKEND OPERATIVE :: AI INNOVATOR
+            </p>
           </div>
 
-          <div className="mt-20 text-sm text-slate-600">
-            © 2025 Anurag Yadav. Built with React & Tailwind.
+          <div className="flex gap-4 items-center">
+             <div className="text-right hidden md:block">
+                <div className="text-xs text-slate-500">SESSION ID</div>
+                <div className="font-mono text-cyan-500">0x24A9-F7</div>
+             </div>
+             <div className="h-12 w-12 border border-cyan-500/50 rounded-full flex items-center justify-center bg-cyan-900/10 animate-spin-slow">
+                <Cpu size={24} className="text-cyan-400" />
+             </div>
           </div>
-        </div>
-      </footer>
+        </header>
+
+        {/* Navigation Tabs (Cyberpunk Style) */}
+        <nav className="flex flex-wrap gap-4 mb-10">
+          {[
+            { id: 'overview', icon: <Activity size={16} />, label: 'SYS_STATUS' },
+            { id: 'projects', icon: <Database size={16} />, label: 'DATA_VAULT' },
+            { id: 'skills', icon: <Zap size={16} />, label: 'MODULES' },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-6 py-2 flex items-center gap-2 border skew-x-[-12deg] transition-all duration-300 ${
+                activeTab === tab.id 
+                  ? 'bg-cyan-600 border-cyan-400 text-black shadow-[0_0_15px_rgba(8,145,178,0.6)]' 
+                  : 'bg-black/40 border-cyan-900 text-cyan-600 hover:border-cyan-500 hover:text-cyan-400'
+              }`}
+            >
+              <div className="skew-x-[12deg] flex items-center gap-2 font-bold tracking-wider text-sm">
+                {tab.icon} {tab.label}
+              </div>
+            </button>
+          ))}
+        </nav>
+
+        {/* Content Area */}
+        <main className="flex-1 relative">
+          
+          {/* OVERVIEW PANEL */}
+          {activeTab === 'overview' && (
+            <div className="grid md:grid-cols-2 gap-8 animate-fade-in">
+              <div className="border border-cyan-900/50 bg-black/40 p-6 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-2 text-xs text-cyan-800 border-l border-b border-cyan-900">BIO_METRICS</div>
+                <div className="flex items-center gap-4 mb-6">
+                   <div className="w-20 h-20 bg-cyan-900/20 rounded flex items-center justify-center border border-cyan-500/30">
+                      <Shield size={40} className="text-cyan-400" />
+                   </div>
+                   <div>
+                      <h2 className="text-xl font-bold text-white">PROFILE_SUMMARY</h2>
+                      <div className="text-cyan-500 text-xs">CLASS: HUMAN // LVL: 2026</div>
+                   </div>
+                </div>
+                <p className="text-slate-400 text-sm leading-relaxed font-mono">
+                  Target is a highly skilled CS Student at <span className="text-cyan-400">VIT AP University</span>. 
+                  Specializes in constructing robust backend architectures and deploying Generative AI models.
+                  <br/><br/>
+                  {'>'} Current Focus: Generative AI & 3D Web Tech<br/>
+                  {'>'} Optimization Record: High Performance APIs<br/>
+                  {'>'} Status: <span className="text-green-400 animate-pulse">AVAILABLE FOR HIRE</span>
+                </p>
+              </div>
+
+              <div className="border border-cyan-900/50 bg-black/40 p-6 relative">
+                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50"></div>
+                 <h3 className="text-cyan-500 font-bold mb-4 flex items-center gap-2"><AlertTriangle size={16}/> RECENT_ALERTS (Achievements)</h3>
+                 <ul className="space-y-4 text-sm font-mono">
+                    <li className="flex gap-3 items-start">
+                       <span className="text-yellow-500">[WARN]</span>
+                       <span className="text-slate-300">System Overload: Top 10 at Hackbyte '24 (200+ Teams)</span>
+                    </li>
+                    <li className="flex gap-3 items-start">
+                       <span className="text-green-500">[OK]</span>
+                       <span className="text-slate-300">Cert Acquired: Oracle OCI GenAI Professional</span>
+                    </li>
+                    <li className="flex gap-3 items-start">
+                       <span className="text-green-500">[OK]</span>
+                       <span className="text-slate-300">Cert Acquired: AWS Cloud Foundations</span>
+                    </li>
+                 </ul>
+              </div>
+            </div>
+          )}
+
+          {/* PROJECTS PANEL (DATA VAULT) */}
+          {activeTab === 'projects' && (
+            <div className="grid gap-6 animate-fade-in">
+              {projects.map((p) => (
+                <div key={p.id} className="group border-l-4 border-cyan-800 bg-slate-900/30 p-6 hover:border-cyan-400 transition-all duration-300 relative overflow-hidden">
+                  {/* Scanline Effect on Hover */}
+                  <div className="absolute inset-0 bg-cyan-500/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 pointer-events-none"></div>
+                  
+                  <div className="flex flex-col md:flex-row justify-between md:items-center mb-4 relative z-10">
+                    <div>
+                      <div className="text-xs text-cyan-600 mb-1">{p.id} // {p.status}</div>
+                      <h3 className="text-2xl font-bold text-white group-hover:text-cyan-300 transition-colors">
+                        {p.name}
+                      </h3>
+                      <div className="text-xs text-slate-500 font-mono">ALIAS: {p.realName}</div>
+                    </div>
+                    <div className="mt-2 md:mt-0 px-3 py-1 border border-red-900 text-red-500 text-xs font-bold rounded">
+                      SEC_LVL: {p.securityLevel}
+                    </div>
+                  </div>
+
+                  <p className="text-slate-300 font-mono text-sm mb-4 relative z-10 max-w-3xl">
+                    <span className="text-cyan-700">{'>'}</span> {p.desc}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2 relative z-10">
+                    {p.tech.map(t => (
+                      <span key={t} className="text-xs bg-cyan-900/30 text-cyan-400 px-2 py-1 rounded border border-cyan-900/50">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                  
+                  <button className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity text-cyan-400 bg-black/80 px-4 py-2 border border-cyan-400 flex items-center gap-2 text-sm hover:bg-cyan-400 hover:text-black font-bold">
+                    <Unlock size={14} /> DECRYPT_SOURCE
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* SKILLS PANEL (MODULES) */}
+          {activeTab === 'skills' && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in">
+              {skills.map((skillGroup, idx) => (
+                <div key={idx} className="border border-slate-800 bg-black/60 p-4 hover:border-white transition-colors">
+                  <h3 className={`text-sm font-bold mb-4 uppercase tracking-widest border-b border-slate-800 pb-2 ${skillGroup.color}`}>
+                    {skillGroup.cat}
+                  </h3>
+                  <div className="space-y-3">
+                    {skillGroup.items.map(item => (
+                      <div key={item} className="flex justify-between items-center group cursor-crosshair">
+                        <span className="text-slate-400 text-sm group-hover:text-white transition-colors">
+                          {item}
+                        </span>
+                        <div className="w-12 h-1 bg-slate-800 rounded-full overflow-hidden">
+                          <div className={`h-full w-[85%] ${skillGroup.color.replace('text', 'bg')} opacity-50 group-hover:opacity-100 group-hover:w-full transition-all duration-500`}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+        </main>
+
+        {/* INTERACTIVE TERMINAL FOOTER */}
+        <footer className="mt-12 border-t border-cyan-900/30 pt-4 bg-black/40 p-4">
+          <div className="h-32 overflow-y-auto font-mono text-sm mb-2 scrollbar-hide border border-cyan-900/30 p-2 bg-black/60">
+             {termHistory.map((line, i) => (
+               <div key={i} className={`mb-1 ${
+                 line.type === 'error' ? 'text-red-500' : 
+                 line.type === 'user' ? 'text-cyan-300' : 'text-green-500'
+               }`}>
+                 {line.type === 'user' ? '> ' : ''}{line.text}
+               </div>
+             ))}
+             <div ref={termEndRef} />
+          </div>
+          
+          <form onSubmit={handleTerminalSubmit} className="flex items-center gap-2 text-sm font-mono text-slate-500">
+             <span className="text-cyan-500">guest@anurag-portfolio:~$</span>
+             <input 
+               type="text" 
+               value={termInput}
+               onChange={(e) => setTermInput(e.target.value)}
+               className="bg-transparent outline-none text-slate-300 flex-1 border-none focus:ring-0"
+               placeholder="Type 'help' for commands..."
+               autoFocus
+             />
+          </form>
+          
+          <div className="flex justify-center gap-6 mt-4 opacity-50 text-xs uppercase tracking-widest">
+             <a href="mailto:anuragyadav.creates@gmail.com" className="hover:text-cyan-400 flex items-center gap-2">
+               <Mail size={12} /> Email
+             </a>
+             <a href="https://github.com" className="hover:text-cyan-400 flex items-center gap-2">
+               <Github size={12} /> GitHub
+             </a>
+          </div>
+        </footer>
+
+      </div>
       
+      {/* Global CSS for CRT lines and animations */}
+      <style>{`
+        .glitch-effect {
+          text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff;
+          animation: glitch 1s infinite linear alternate-reverse;
+        }
+        @keyframes glitch {
+          0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 1px); }
+          20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -1px); }
+          40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 2px); }
+          60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
+          80% { clip-path: inset(10% 0 60% 0); transform: translate(-1px, 2px); }
+          100% { clip-path: inset(30% 0 40% 0); transform: translate(1px, -2px); }
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 };

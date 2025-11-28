@@ -193,21 +193,25 @@ const Portfolio = () => {
       category: "Full Stack Productivity",
       desc: "Robust task management system with Kanban boards and role-based access. Features secure Clerk authentication, multi-tenancy for data isolation, and a scalable FastAPI backend with PostgreSQL.",
       tech: ["FastAPI", "React", "PostgreSQL", "Clerk Auth", "Three.js"],
-      links: { live: "https://employee-task-manager-five.vercel.app/", code: "https://github.com/ydvanuragcreates/employee-task-manager" }
+      links: { live: "https://employee-task-manager-five.vercel.app/", code: "https://github.com/ydvanuragcreates/employee-task-manager" },
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800" // Dashboard/Analytics
     },
     {
       title: "Ocean AI (Doc Generator)",
       category: "Generative AI Tool",
       desc: "Automated report generation engine using FastAPI and Three.js. Generates structured Word/PPT documents with real-time 3D previews.",
       tech: ["FastAPI", "React", "Three.js", "Gemini API"],
-      links: { live: "https://ocean-ai-eta.vercel.app/", code: "https://github.com/ydvanuragcreates/Ocean-AI" }
+      links: { live: "https://ocean-ai-eta.vercel.app/", code: "https://github.com/ydvanuragcreates/Ocean-AI" },
+      image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800" // Abstract AI/Nodes
     },
     {
       title: "Medical AI Chatbot",
       category: "Healthcare AI",
       desc: "A secure RAG-based assistant utilizing Gemini LLM and Pinecone for precise medical query resolution. Features strict data privacy protocols.",
       tech: ["Python", "Flask", "LangChain", "Gemini", "Pinecone"],
-      links: { live: null, code: "https://github.com/ydvanuragcreates/Medical-chatbot" } // Live link null
+      links: { live: null, code: "https://github.com/ydvanuragcreates/Medical-chatbot" },
+      // REPLACED IMAGE URL WITH A MORE RELIABLE ONE
+      image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800" 
     }
   ];
 
@@ -287,11 +291,15 @@ const Portfolio = () => {
                     )}
                   </div>
                 </div>
-                {/* Decorative Abstract Visual for Project */}
-                <div className="hidden md:block h-full min-h-[200px] bg-zinc-50 rounded-xl border border-zinc-100 relative overflow-hidden group-hover:border-zinc-200 transition-colors">
-                   <div className="absolute inset-0 bg-gradient-to-br from-zinc-100 to-transparent opacity-50"></div>
-                   <div className="absolute bottom-4 right-4 p-2 bg-white rounded-lg shadow-sm border border-zinc-100">
-                      <Code2 className="text-zinc-300" size={24} />
+                {/* Project Image Card */}
+                <div className="hidden md:block h-full min-h-[250px] bg-zinc-50 rounded-xl border border-zinc-100 relative overflow-hidden group-hover:border-zinc-200 transition-colors">
+                   <div className="absolute inset-0 bg-zinc-100">
+                     <img 
+                       src={project.image} 
+                       alt={project.title}
+                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                     />
+                     <div className="absolute inset-0 bg-zinc-900/5 group-hover:bg-transparent transition-colors"></div>
                    </div>
                 </div>
               </div>
